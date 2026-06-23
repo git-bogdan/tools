@@ -247,13 +247,14 @@
   <ul id="list"></ul>
   
   <div id="help">
-    <kbd>Ctrl</kbd>+<kbd>F</kbd> Search &nbsp; 
     <kbd>&uarr;&darr;</kbd> / <kbd>Ctrl</kbd>+<kbd>J/K</kbd> Navigate &nbsp; 
     <kbd>Enter</kbd> Copy &nbsp; 
     <kbd>Ctrl</kbd>+<kbd>Enter</kbd> Edit &nbsp; 
     <kbd>Ctrl</kbd>+<kbd>A</kbd> Add &nbsp; 
     <kbd>Del</kbd> Delete &nbsp; 
-    <kbd>Esc</kbd> Clear
+    <kbd>Esc</kbd> Clear &nbsp; 
+    <kbd>Alt</kbd>+<kbd>I</kbd> Import &nbsp; 
+    <kbd>Alt</kbd>+<kbd>E</kbd> Export
   </div>
 </div>
 
@@ -406,13 +407,13 @@
       const iconsDiv = document.createElement('div');
       iconsDiv.className = 'action-icons';
 
-      const copyIcon = document.createElement('div');
-      copyIcon.className = 'action-icon';
-      copyIcon.innerHTML = '&#128203;'; // clipboard emoji
-      copyIcon.title = 'Copy value to clipboard';
-      copyIcon.onclick = (e) => {
+      const editIcon = document.createElement('div');
+      editIcon.className = 'action-icon';
+      editIcon.innerHTML = '&#9998;'; // edit pencil emoji
+      editIcon.title = 'Edit entry';
+      editIcon.onclick = (e) => {
         e.stopPropagation();
-        copyToClipboard(item.value);
+        openModal(item);
       };
 
       const deleteIcon = document.createElement('div');
@@ -426,7 +427,7 @@
         document.activeElement.blur();
       };
 
-      iconsDiv.appendChild(copyIcon);
+      iconsDiv.appendChild(editIcon);
       iconsDiv.appendChild(deleteIcon);
 
       headerDiv.appendChild(keyDiv);
@@ -442,7 +443,7 @@
       li.onclick = () => {
         selectedIndex = index;
         updateSelection();
-        openModal(item);
+        copyToClipboard(item.value);
       };
       
       listEl.appendChild(li);
@@ -665,15 +666,12 @@
       return;
     }
 
-    if (e.ctrlKey && e.key === 'f' && document.activeElement !== searchInput) {
-      searchInput.focus();
-      e.preventDefault();
-    } else if (e.key === 'Escape') {
+    if (e.key === 'Escape') {
       if (searchInput.value !== '') {
         searchInput.value = '';
         renderList();
       }
-      searchInput.blur();
+      searchInput.focus();
       e.preventDefault();
     } else if (e.key === 'ArrowDown' || (e.ctrlKey && e.key === 'j')) {
       if (selectedIndex < filteredItems.length - 1) {
@@ -689,6 +687,12 @@
       e.preventDefault();
     } else if (e.ctrlKey && e.key === 'a') {
       openModal();
+      e.preventDefault();
+    } else if (e.altKey && e.key.toLowerCase() === 'i') {
+      importData();
+      e.preventDefault();
+    } else if (e.altKey && e.key.toLowerCase() === 'e') {
+      exportData();
       e.preventDefault();
     } else if (e.key === 'Enter') {
       if (e.ctrlKey) {
